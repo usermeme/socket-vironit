@@ -1,0 +1,30 @@
+{
+  "name": "socket-vironit",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test:c": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/usermeme/socket-vironit.git"
+  },
+  "author": "Roman Yankovich",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/usermeme/socket-vironit/issues"
+  },
+  "homepage": "https://github.com/usermeme/socket-vironit#readme",
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.17.2"
+  },
+  "dependencies": {
+    "jest": "^24.8.0",
+    "jest-cli": "^24.8.0",
+    "ws": "^7.0.0"
+  }
+}
