@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint **/*.js --fix --ignore-pattern node_modules/",
     "test": "jest",
     "test:c": "jest --coverage"
   },
