@@ -16,12 +16,12 @@ const client = net.createConnection({ port: PORT, host: HOST }, () => {
     while ((chunk = process.stdin.read()) !== null) {
       str += chunk;
     }
-    client.write(str.replace(/\s/g, ''));
+    client.write(str);
   });
 });
 
 client.on('data', (data) => {
-  if (data.toString() === 'end') {
+  if (data.toString() === '/end') {
     client.end();
     return;
   }

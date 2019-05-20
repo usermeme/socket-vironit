@@ -1,40 +1,60 @@
+/* eslint-disable no-console */
 const net = require('net');
 
 const HOST = '127.0.0.1';
 const PORT = 8080;
+const idRegExp = /\d{1,}\.\d{1,}\.\d{1,}\.\d{1,}:\d{4,}/;
 
 const connectionList = [];
-const arrClient = []
 
 const command = {
-  list: connectionList.toString(),
-  end: 'end',
-  hello: 'world',
-  startmessage: 'enter address',
+  '/list': connectionList
+    .map(elem => elem.address)
+    .toString(),
+  '/end': '/end',
+  '/startMessage': 'enter address',
 };
-command.help = `${Object.keys(command)}`;
+command['/help'] = `${Object.keys(command)}`;
 
-const updateData = () => {
-  command.list = connectionList.toString();
-};
-
-const idRegExp = /\d{1,}\.\d{1,}\.\d{1,}\.\d{1,}:\d{4,}/;
+function updateData() {
+  command['/list'] = connectionList
+    .map(elem => elem.address)
+    .toString();
+}
 
 const server = net.createServer((client) => {
   console.log(`CONNECTED: ${client.remoteAddress}:${client.remotePort}`);
 
-  connectionList.push(`${client.remoteAddress}:${client.remotePort}`);
-  arrClient.push(client);
+  connectionList.push({
+    address: `${client.remoteAddress}:${client.remotePort}`,
+    client,
+  });
+
+  let interlocutor = client;
   updateData();
 
   client.on('data', (data) => {
-    if (data.toString().match(idRegExp)) {
-      
-    }
-    const result = command[data.toString()] || 'incorrect input';
-    client.write(result);
+    const message = data.toString().replace(/\s/g, '');
+    if (message.match(idRegExp)) {
+      const index = connectionList.findIndex(elem => elem.address === message);
 
-    server.close();
+      if (index >= 0) {
+        interlocutor = connectionList[index].client;
+      }
+      return;
+    }
+
+    if (interlocutor !== client) {
+      interlocutor.write(`${new Date()}::${client.remoteAddress}:${client.remotePort}:  ${message}`);
+      return;
+    }
+    const result = command[message] || 'incorrect input';
+    interlocutor.write(result);
+
+    if (result === '/end') {
+      connectionList.slice(connectionList);
+      server.close();
+    }
   });
 });
 
