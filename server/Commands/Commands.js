@@ -25,9 +25,9 @@ class Commands {
     const client = args[2];
 
     client.write(`
-    /list - clients addresses,
+    /list - clients address,
     /exit - exit,
-    /call - start chat
+    /call [address] - start chat
     `);
   }
 
@@ -43,17 +43,42 @@ class Commands {
       return false;
     }
 
-    const index = connectionList.findIndex(elem => elem.address === address);
-    const interlocutor = connectionList[index].client;
+    const interlocutor = Commands.findInterlocutor(connectionList, address);
+    const selfAddress = `${client.remoteAddress}:${client.remotePort}`;
 
-    interlocutor.write(`${client.remoteAddress}:${client.remotePort} start chat (yes/no)`);
+    client.write(`chat started with ${address}`);
+
+    interlocutor.write(`
+    ${selfAddress} started chatting with you,
+    /call ${selfAddress} for answer
+    `);
+
     return interlocutor;
+  }
+
+  static findInterlocutor(connectionList, address) {
+    const index = connectionList.findIndex(elem => elem.address === address);
+    return connectionList[index].client;
   }
 
   static getCommand(message) {
     return message
       .replace(/\s{1,}/g, ' ')
       .split(' ');
+  }
+
+  static showConnect(connectionList, client) {
+    const clients = connectionList
+      .filter(elem => elem.client !== client)
+      .map(elem => elem.client);
+
+    if (!clients.length) {
+      return;
+    }
+    
+    clients.forEach((element) => {
+      element.write(`${client.remoteAddress}:${client.remotePort} connected`);
+    });
   }
 }
 
