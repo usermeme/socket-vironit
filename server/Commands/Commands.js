@@ -26,7 +26,7 @@ class Commands {
 
     client.write(`
     /list - clients addresses,
-    /end - exit,
+    /exit - exit,
     /call - start chat
     `);
   }
