@@ -17,7 +17,7 @@ class Commands {
     const client = args[2];
 
     client.write('/exit');
-    connectionList.slice(connectionList.findIndex(elem => elem.client === client), 1);
+    connectionList.splice(connectionList.findIndex(elem => elem.client === client), 1);
     server.close();
   }
 
