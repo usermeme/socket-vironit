@@ -8,17 +8,17 @@ const PORT = 8080;
 const connectionList = [];
 
 const server = net.createServer((client) => {
-  console.log(`CONNECTED: ${client.remoteAddress}:${client.remotePort}`);
-
   connectionList.push({
     address: `${client.remoteAddress}:${client.remotePort}`,
     client,
   });
 
+  Commands.showConnect(connectionList, client);
+
   let interlocutor = client;
 
   client.on('data', (data) => {
-    const message = data.toString();
+    const message = data.toString().slice(0, -1);
 
     if (message.search(/^\//g) !== -1) { // if we write a command
       const command = Commands.getCommand(message)[0];
@@ -30,9 +30,11 @@ const server = net.createServer((client) => {
       return;
     }
 
-
     if (interlocutor !== client) {
-      interlocutor.write(`${new Date()}::${client.remoteAddress}:${client.remotePort}:  ${message}`);
+      const date = new Date();
+      const dateString = `${date.getFullYear()}.${date.getMonth()}.${date.getDay()} ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+
+      interlocutor.write(`${client.remoteAddress}:${client.remotePort} ${dateString}:  ${message}`);
     }
   });
 });
