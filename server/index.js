@@ -1,26 +1,11 @@
 /* eslint-disable no-console */
 const net = require('net');
+const Commands = require('./Commands/Commands');
 
 const HOST = '127.0.0.1';
 const PORT = 8080;
-const idRegExp = /\d{1,}\.\d{1,}\.\d{1,}\.\d{1,}:\d{4,}/;
 
 const connectionList = [];
-
-const command = {
-  '/list': connectionList
-    .map(elem => elem.address)
-    .toString(),
-  '/end': '/end',
-  '/startMessage': 'enter address',
-};
-command['/help'] = `${Object.keys(command)}`;
-
-function updateData() {
-  command['/list'] = connectionList
-    .map(elem => elem.address)
-    .toString();
-}
 
 const server = net.createServer((client) => {
   console.log(`CONNECTED: ${client.remoteAddress}:${client.remotePort}`);
@@ -31,29 +16,23 @@ const server = net.createServer((client) => {
   });
 
   let interlocutor = client;
-  updateData();
 
   client.on('data', (data) => {
-    const message = data.toString().replace(/\s/g, '');
-    if (message.match(idRegExp)) {
-      const index = connectionList.findIndex(elem => elem.address === message);
+    const message = data.toString();
 
-      if (index >= 0) {
-        interlocutor = connectionList[index].client;
+    if (message.search(/^\//g) !== -1) { // if we write a command
+      const command = Commands.getCommand(message)[0];
+      const address = Commands.getCommand(message)[1];
+
+      if (Commands[command]) {
+        interlocutor = Commands[command](connectionList, server, client, address) || client;
       }
       return;
     }
 
+
     if (interlocutor !== client) {
       interlocutor.write(`${new Date()}::${client.remoteAddress}:${client.remotePort}:  ${message}`);
-      return;
-    }
-    const result = command[message] || 'incorrect input';
-    interlocutor.write(result);
-
-    if (result === '/end') {
-      connectionList.slice(connectionList);
-      server.close();
     }
   });
 });
