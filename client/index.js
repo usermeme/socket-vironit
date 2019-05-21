@@ -21,7 +21,7 @@ const client = net.createConnection({ port: PORT, host: HOST }, () => {
 });
 
 client.on('data', (data) => {
-  if (data.toString() === '/end') {
+  if (data.toString() === '/exit') {
     client.end();
     return;
   }
