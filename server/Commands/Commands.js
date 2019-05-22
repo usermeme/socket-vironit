@@ -75,7 +75,7 @@ class Commands {
     if (!clients.length) {
       return;
     }
-    
+
     clients.forEach((element) => {
       element.write(`${client.remoteAddress}:${client.remotePort} connected`);
     });
