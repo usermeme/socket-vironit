@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
+// eslint-disable-next-line import/no-extraneous-dependencies
+require('dotenv').config();
+
 const net = require('net');
 const Commands = require('./Commands/Commands');
-
-const HOST = '127.0.0.1';
-const PORT = 8080;
 
 const connectionList = [];
 
@@ -39,4 +39,4 @@ const server = net.createServer((client) => {
   });
 });
 
-server.listen(PORT, HOST);
+server.listen(process.env.PORT, process.env.HOST);
