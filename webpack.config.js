@@ -1,6 +1,7 @@
 const path = require('path');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const autoprefixer = require('autoprefixer');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const WebpackMd5Hash = require('webpack-md5-hash');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   devtool: 'source-map',
@@ -10,7 +11,7 @@ module.exports = {
   ],
   output: {
     path: path.join(__dirname, 'client/dist'),
-    filename: 'bundle.js',
+    filename: '[name].[chunkhash].js',
   },
   module: {
     rules: [
@@ -30,35 +31,8 @@ module.exports = {
         ],
       },
       {
-        test: /\.s?css/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            {
-              loader: 'css-loader',
-              options: {
-                sourceMap: true,
-              },
-            },
-            {
-              loader: 'postcss-loader',
-              options: {
-                plugins: [
-                  autoprefixer({
-                    browsers: ['ie >= 8', 'last 4 version'],
-                  }),
-                ],
-                sourceMap: true,
-              },
-            },
-            {
-              loader: 'sass-loader',
-              options: {
-                sourceMap: true,
-              },
-            },
-          ],
-        }),
+        test: /\.scss$/,
+        use: ['style-loader', MiniCssExtractPlugin.loader, 'css-loader', 'postcss-loader', 'sass-loader'],
       },
       {
         test: /\.(jpe?g|png|gif)(\?[a-z0-9=.]+)?$/,
@@ -75,6 +49,15 @@ module.exports = {
     ],
   },
   plugins: [
-    new ExtractTextPlugin('style.css'),
+    new MiniCssExtractPlugin({
+      filename: 'style.[contenthash].css',
+    }),
+    new HtmlWebpackPlugin({
+      inject: false,
+      hash: true,
+      template: './client/src/index.html',
+      filename: 'index.html',
+    }),
+    new WebpackMd5Hash(),
   ],
 };
